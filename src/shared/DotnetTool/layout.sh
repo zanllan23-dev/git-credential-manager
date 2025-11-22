@@ -21,6 +21,10 @@ case "$i" in
     CONFIGURATION="${i#*=}"
     shift # past argument=value
     ;;
+    --output=*)
+    OUTDIR="${i#*=}"
+    shift # past argument=value
+    ;;
     *)
           # unknown option
     ;;
@@ -42,7 +46,9 @@ CONFIGURATION="${CONFIGURATION:=Debug}"
 FRAMEWORK=net8.0
 
 # Outputs
-OUTDIR="$PROJ_OUT/nupkg/$CONFIGURATION"
+if [ -z "$OUTDIR" ]; then
+    OUTDIR="$PROJ_OUT/nupkg/$CONFIGURATION"
+fi
 IMGOUT="$OUTDIR/images"
 PAYLOAD="$OUTDIR/payload"
 SYMBOLOUT="$OUTDIR/payload.sym"

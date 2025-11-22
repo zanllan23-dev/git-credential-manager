@@ -12,12 +12,16 @@ case "$i" in
     CONFIGURATION="${i#*=}"
     shift # past argument=value
     ;;
-	--version=*)
+    --version=*)
     VERSION="${i#*=}"
     shift # past argument=value
     ;;
-	--publish-dir=*)
-    PUBLISH_DIR="${i#*=}"
+    --package-root=*)
+    PACKAGE_ROOT="${i#*=}"
+    shift # past argument=value
+    ;;
+    --output=*)
+    OUTPUT="${i#*=}"
     shift # past argument=value
     ;;
     *)
@@ -38,15 +42,23 @@ SRC="$ROOT/src"
 OUT="$ROOT/out"
 DOTNET_TOOL="shared/DotnetTool"
 
-if [ -z "$PUBLISH_DIR" ]; then
-    PUBLISH_DIR="$OUT/$DOTNET_TOOL/nupkg/$CONFIGURATION"
+if [ -z "$PACKAGE_ROOT" ]; then
+    PACKAGE_ROOT="$OUT/$DOTNET_TOOL/nupkg/$CONFIGURATION"
 fi
 
 echo "Creating dotnet tool package..."
 
-dotnet pack "$SRC/$DOTNET_TOOL/DotnetTool.csproj" \
-    /p:Configuration="$CONFIGURATION" \
-    /p:PackageVersion="$VERSION" \
-    /p:PublishDir="$PUBLISH_DIR/"
+if [ -z "$OUTPUT" ]; then
+    dotnet pack "$SRC/$DOTNET_TOOL/DotnetTool.csproj" \
+        /p:Configuration="$CONFIGURATION" \
+        /p:PackageVersion="$VERSION" \
+        /p:PublishDir="$PACKAGE_ROOT/"
+else
+    dotnet pack "$SRC/$DOTNET_TOOL/DotnetTool.csproj" \
+        /p:Configuration="$CONFIGURATION" \
+        /p:PackageVersion="$VERSION" \
+        /p:PublishDir="$PACKAGE_ROOT/" \
+        --output "$OUTPUT"
+fi
 
 echo "Dotnet tool pack complete."
